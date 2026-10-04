@@ -70,7 +70,7 @@ async def cmd_model(message: Message):
     text = (
         f"🤖 **Model holati:**\n"
         f"• Model: `{MODEL_NAME}`\n"
-        f"• Lokatsiya: Mahalliy (Ollama / Local GPU)\n"
+        f"• API: OpenRouter Cloud (Ultra-tez & Arzon)\n"
         f"• Klinikaga tegishli toifalar soni: {len(classifier.categories)}"
     )
     await message.answer(text)
@@ -114,6 +114,27 @@ async def handle_message(message: Message):
 async def main():
     logger.info("Bot ishga tushmoqda...")
     logger.info(f"Ishlatilayotgan model: {MODEL_NAME}")
+    
+    # Bot bio va ta'rifini yangilash
+    try:
+        bio = "🏥 «Shifo Nur Med» klinikasi AI yordamchisi. Guruhda manzil, narxlar, shifokorlar va ish vaqtiga avtomatik javob beradi."
+        desc = (
+            "🏥 «Shifo Nur Med» klinikasi rasmiy sun'iy intellekt yordamchisi!\n\n"
+            "Bu bot Telegram guruhda va shaxsiy suhbatda quyidagi mavzularda yordam beradi:\n"
+            "📍 Klinika manzili va lokatsiyasi\n"
+            "⏰ Ish tartibi va qabul vaqtlari\n"
+            "💳 Xizmatlar, tahlillar (UZI, MRT) va narxlar\n"
+            "👨‍⚕️ Shifokorlar ko'rigi va navbatga yozilish\n"
+            "📞 Bog'lanish va Call-markaz kontaktlari\n"
+            "🚨 24/7 Shoshilinch tibbiy yordam\n\n"
+            "Sinash uchun guruhga qo'shing yoki shu yerga savol yozing!"
+        )
+        await bot.set_my_short_description(short_description=bio)
+        await bot.set_my_description(description=desc)
+        logger.info("Bot Bio va Description muvaffaqiyatli yangilandi.")
+    except Exception as e:
+        logger.warning(f"Bio o'rnatishda xatolik: {e}")
+
     # Eskirgan update larni o'chirib yuborish
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
