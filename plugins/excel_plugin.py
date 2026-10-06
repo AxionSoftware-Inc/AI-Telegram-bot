@@ -12,7 +12,7 @@ logger = logging.getLogger("ExcelPlugin")
 
 class ExcelPlugin(BasePlugin):
     name = "ExcelAnalyzer"
-    description = "Excel (.xlsx, .xls) fayllarni yuklash, o'qish va Gemma 4 modeli orqali tahlil qilish plugini"
+    description = "Excel (.xlsx) jadvallari va hisobotlarni Gemma 4 sun'iy intellekti orqali tahlil qilish plugini"
     priority = 20  # Yuqori prioritet, chunki fayllar va hisobot so'rovlari aniq
 
     def __init__(self):

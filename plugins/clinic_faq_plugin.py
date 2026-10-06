@@ -12,7 +12,7 @@ logger = logging.getLogger("ClinicFAQPlugin")
 
 class ClinicFAQPlugin(BasePlugin):
     name = "ClinicFAQ"
-    description = "Klinikaga oid savollarni (manzil, ish vaqti, narxlar, shifokorlar) tahlil qilib tayyor javob berish plugini"
+    description = "Mijozlarning tez-tez beriladigan savollari (FAQ, ma'lumotlar) bo'yicha tabiiy tilda yordam berish plugini"
     priority = 80
 
     def __init__(self):

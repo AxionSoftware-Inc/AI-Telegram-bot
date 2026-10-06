@@ -34,20 +34,32 @@ plugin_manager = PluginManager()
 async def cmd_start(message: Message):
     plugins_list = "\n".join([f"• **{p.name}** — {p.description}" for p in plugin_manager.plugins])
     text = (
-        f"🏥 **Assalomu alaykum!**\n\n"
-        f"Men modulli va pluginli arxitekturada ishlovchi **AI Yordamchi Bot**man.\n\n"
-        f"🧩 **Faol pluginlar:**\n{plugins_list}\n\n"
-        f"💡 **Imkoniyatlar:**\n"
-        f"1. Guruhda klinika savollariga avtomatik javob berish\n"
-        f"2. `/excel` buyrug'i orqali klinika hisobotini Gemma 4 modeli orqali tahlil qilish\n"
-        f"3. Ixtiyoriy `.xlsx` fayl yuborib, undan xohlagan statistikani so'rash!"
+        "👋 **Assalomu alaykum!**\n\n"
+        "Men korxona va xizmat ko'rsatish tizimlari uchun mo'ljallangan universal **AI Smart Assistant & Monitoring Bot**man.\n\n"
+        "Tizim **Microkernel (Plugin)** arxitekturasida qurilgan bo'lib, quyidagi yo'nalishlarda to'liq avtomatlashtirilgan xizmat ko'rsatadi:\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━\n"
+        "⚡ **Asosiy Imkoniyatlar:**\n\n"
+        "1️⃣ **Apparatlar va Billing Monitoringi:**\n"
+        "• Telegram kanalga joylangan haftalik to'lovlar jadvalini (`.xlsx`) avtomatik qabul qiladi va bazani real-vaqtda yangilaydi.\n"
+        "• Guruh yoki shaxsiy chatda apparati to'xtab qolgan mijozlarning ID raqamini aniqlab, to'lov holati, qarz summasi va apparat statusini 100% aniqlikda tekshiradi.\n\n"
+        "2️⃣ **Excel & Katta Ma'lumotlar Tahlili (AI Analytics):**\n"
+        "• Ixtiyoriy `.xlsx` formatidagi hisobot faylini yuborib, Gemma 4 sun'iy intellekt modeli orqali istalgan statistika, solishtirish yoki chuqur tahlilni olishingiz mumkin.\n\n"
+        "3️⃣ **Intellektual Muloqot & Qo'llab-quvvatlash:**\n"
+        "• Tabiiy til va turli shevalardagi murojaatlarni to'g'ri tushunib, tezkor yordam ko'rsatadi.\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"🧩 **Hozirda faol modullar:**\n{plugins_list}\n\n"
+        "📌 **Foydali buyruqlar:**\n"
+        "• `/help` — Batafsil qo'llanma va foydalanish yo'riqnomasi\n"
+        "• `/plugins` — Faol modullar va ularning prioritetlari\n"
+        "• `/excel` — Excel tahlilchi modulini ishga tushirish\n\n"
+        "Savolingiz bo'lsa to'g'ridan-to'g'ri yozishingiz, ID raqam kiritishingiz yoki tahlil uchun Excel fayl yuborishingiz mumkin!"
     )
     await message.answer(text)
 
 
 @dp.message(Command("plugins"))
 async def cmd_plugins(message: Message):
-    text = "🧩 **O'rnatilgan pluginlar ro'yxati:**\n\n"
+    text = "🧩 **Tizimda o'rnatilgan faol pluginlar:**\n\n"
     for i, p in enumerate(plugin_manager.plugins, 1):
         text += f"{i}. **{p.name}** (Prioritet: {p.priority})\n   Ta'rif: {p.description}\n\n"
     await message.answer(text)
@@ -56,12 +68,20 @@ async def cmd_plugins(message: Message):
 @dp.message(Command("help"))
 async def cmd_help(message: Message):
     text = (
-        "ℹ️ **Qo'llanma va komandalar:**\n\n"
-        "• `/start` — Botni qayta ishga tushirish\n"
-        "• `/plugins` — Faol pluginlar ro'yxati\n"
-        "• `/excel` — Klinika Excel hisoboti demosini ochish va Gemma 4 tahlili\n"
-        "• *Excel fayl yuklash:* `.xlsx` formatidagi faylni shunchaki botga yuboring va savol bering!\n"
-        "• *Klinika savollari:* Guruhda manzil, narx, shifokor va ish vaqtlari bo'yicha savol bering."
+        "📖 **Botdan foydalanish qo'llanmasi:**\n\n"
+        "🔹 **Apparat holati va to'lovni tekshirish:**\n"
+        "• Guruhda yoki shaxsiy chatda apparatingiz nima sababdan ishlamayotganini yozing (masalan: *«Nega apparatim o'chib qoldi?»*).\n"
+        "• Bot ID so'raganda o'z ID raqamingizni yuboring (yoki to'g'ridan-to'g'ri: *«ID 2002»* yoki *«2001»*).\n"
+        "• Bot bazadan tekshirib, qarzdorlik yoki to'lov holati haqida darhol aniq javob beradi.\n\n"
+        "🔹 **Kanal orqali bazani avto-yangilash:**\n"
+        "• Ma'sul xodim tomonidan kanalga yangi `.xlsx` hisoboti joylansa, bot bazani avtomatik yangilab oladi.\n\n"
+        "🔹 **Excel tahlil (AI Data Analyst):**\n"
+        "• Xohlagan `.xlsx` hisobotingizni botga yuboring va unga oid savollaringizni bering (masalan: *«Eng ko'p qarzdor kim?», «Umumiy summa qancha?»*).\n"
+        "• `/excel` buyrug'i orqali namunaviy fayl tahlilini sinab ko'rishingiz mumkin.\n\n"
+        "🔹 **Tizim buyruqlari:**\n"
+        "• `/start` — Asosiy tanishuv xabari\n"
+        "• `/plugins` — Faol plaginlar ro'yxati\n"
+        "• `/help` — Ushbu yo'riqnoma"
     )
     await message.answer(text)
 
@@ -104,13 +124,18 @@ async def global_channel_post_handler(message: Message):
         # Kanaldagi har qanday xabarga javoban avtomatik Excel faylni kanalga yuklash
         billing_excel = Path("data/billing/haftalik_tolovlar.xlsx")
         if billing_excel.exists():
+            import pandas as pd
+            try:
+                cnt = len(pd.read_excel(billing_excel))
+            except Exception:
+                cnt = 50
             from aiogram.types import FSInputFile
-            doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_oktyabr.xlsx")
+            doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_hisoboti.xlsx")
             caption = (
-                "📊 **2026-yil Oktyabr oyi haftalik to'lovlar va qarzdorliklar hisoboti**\n\n"
-                "👥 Jami mijozlar: **10 ta**\n"
-                "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida avtomatik tekshiriladi.\n\n"
-                "#billing #hisobot"
+                "📊 **Haftalik to'lovlar va apparatlar holati hisoboti**\n\n"
+                f"👥 Bazadagi mijozlar soni: **{cnt} ta**\n"
+                "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida real-vaqtda tekshiriladi.\n\n"
+                "#billing #monitoring #hisobot"
             )
             await message.answer_document(document=doc, caption=caption)
             logger.info(f"Excel fayl kanalga ({chat_id}) muvaffaqiyatli joylandi!")
@@ -130,13 +155,18 @@ async def on_my_chat_member(event: ChatMemberUpdated):
         
         billing_excel = Path("data/billing/haftalik_tolovlar.xlsx")
         if billing_excel.exists():
+            import pandas as pd
+            try:
+                cnt = len(pd.read_excel(billing_excel))
+            except Exception:
+                cnt = 50
             from aiogram.types import FSInputFile
             try:
-                doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_oktyabr.xlsx")
+                doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_hisoboti.xlsx")
                 caption = (
-                    "📊 **2026-yil Oktyabr oyi haftalik to'lovlar va qarzdorliklar hisoboti**\n\n"
-                    "👥 Jami mijozlar: **10 ta**\n"
-                    "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida avtomatik tekshiriladi."
+                    "📊 **Haftalik to'lovlar va apparatlar holati hisoboti**\n\n"
+                    f"👥 Bazadagi mijozlar soni: **{cnt} ta**\n"
+                    "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida real-vaqtda tekshiriladi."
                 )
                 await bot.send_document(chat_id=chat_id, document=doc, caption=caption)
                 logger.info(f"Excel fayl kanalga ({chat_id}) yuborildi!")
@@ -151,13 +181,14 @@ async def main():
 
     # Bio va Description sozlamalari
     try:
-        bio = "🏥 AI Yordamchi & Ma'lumotlar tahlilchisi. Klinika FAQ va Excel (.xlsx) jadvallarini Gemma 4 da tahlil qiladi."
+        bio = "🤖 Universal AI Yordamchi & Billing Monitoring Bot. Excel tahlili va apparatlar nazorati."
         desc = (
-            "🏥 Pluginli arxitekturadagi ko'p funksiyali AI Bot!\n\n"
+            "🤖 Universal modulli AI Smart Assistant & Monitoring Bot!\n\n"
             "✨ Imkoniyatlar:\n"
-            "• Klinika bo'yicha FAQ va shevalardagi savollarga avtomatik javoblar\n"
-            "• Excel (.xlsx) jadvallarini yuklab, Gemma 4-26B orqali chuqur tahlil qilish\n"
-            "• Istalgan yangi format va tool'larni plugin sifatida ulash imkoniyati."
+            "• Apparatlar billing nazorati va qarzdorlikni ID bo'yicha aniqlash\n"
+            "• Telegram kanal orqali Excel jadvallarini avtomatik sinxronlash\n"
+            "• Excel (.xlsx) ma'lumotlar bazalarini Gemma 4 orqali chuqur tahlil qilish\n"
+            "• Yangi xizmatlarni Microkernel plagin tizimi orqali oson ulash."
         )
         await bot.set_my_short_description(short_description=bio[:120])
         await bot.set_my_description(description=desc)

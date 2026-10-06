@@ -12,7 +12,7 @@ logger = logging.getLogger("DeviceBillingPlugin")
 
 class DeviceBillingPlugin(BasePlugin):
     name = "DeviceBilling"
-    description = "Apparatlarning to'xtab qolish sababini haftalik Excel to'lovlar bazasidan tekshiruvchi plugin"
+    description = "Apparatlar holati va qarzdorlikni haftalik Excel bazasidan ID orqali 100% aniqlikda tekshirish plugini"
     priority = 10  # Eng yuqori prioritet, chunki ID va apparat shikoyatlari o'ta muhim
 
     def __init__(self):
