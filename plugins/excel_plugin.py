@@ -16,7 +16,7 @@ class ExcelPlugin(BasePlugin):
     priority = 20  # Yuqori prioritet, chunki fayllar va hisobot so'rovlari aniq
 
     def __init__(self):
-        self.llm = LLMClient(model_name="gemma4-26b:latest")
+        self.llm = LLMClient()
         self.active_files: Dict[int, str] = {}  # chat_id -> excel_file_path
         self.downloads_dir = Path(__file__).resolve().parent.parent / "data" / "downloads"
         self.downloads_dir.mkdir(parents=True, exist_ok=True)

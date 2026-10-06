@@ -21,7 +21,7 @@ class ClinicFAQPlugin(BasePlugin):
         
         self.clinic_name = self.data.get("clinic_name", "Klinika")
         self.categories = self.data.get("categories", {})
-        self.llm = LLMClient(model_name="qwen3-8b-local")
+        self.llm = LLMClient()
 
         cat_descriptions = []
         for code, info in self.categories.items():
