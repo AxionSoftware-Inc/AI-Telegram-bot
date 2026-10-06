@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 venv/
 .venv/
+data/downloads/
+data/channel_id.txt

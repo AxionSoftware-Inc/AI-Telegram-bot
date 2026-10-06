@@ -1,143 +1,175 @@
 import asyncio
 import logging
-import time
-from typing import Dict
+from typing import Dict, Any
 
+from pathlib import Path
 from aiogram import Bot, Dispatcher, F
-from aiogram.enums import ParseMode, ChatType
+from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
+from aiogram.types import Message, ChatMemberUpdated, FSInputFile
 from aiogram.client.default import DefaultBotProperties
 
-from config import BOT_TOKEN, MODEL_NAME, COOLDOWN_SECONDS
-from classifier import ClinicClassifier
+from config import BOT_TOKEN
+from core.plugin_manager import PluginManager
 
 # Logging sozlamalari
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
-logger = logging.getLogger("ClinicBot")
+logger = logging.getLogger("CoreBot")
 
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN ko'rsatilmagan! .env faylini tekshiring.")
 
-# Bot va Dispatcher yaratish
 bot = Bot(
     token=BOT_TOKEN,
     default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN)
 )
 dp = Dispatcher()
-classifier = ClinicClassifier()
-
-# Spam / Cooldown nazorati (chat_id: timestamp)
-last_reply_times: Dict[int, float] = {}
+plugin_manager = PluginManager()
 
 
 @dp.message(CommandStart())
 async def cmd_start(message: Message):
-    """Start komandasi"""
+    plugins_list = "\n".join([f"• **{p.name}** — {p.description}" for p in plugin_manager.plugins])
     text = (
         f"🏥 **Assalomu alaykum!**\n\n"
-        f"Men **«{classifier.clinic_name}»** avtomatlashtirilgan yordamchi botiman.\n\n"
-        f"Guruhdagi xabarlarni o'qib, klinika bo'yicha berilgan savollarga (manzil, ish vaqti, narxlar, shifokorlar, aloqa) "
-        f"tayyor javoblarni tanlab uzatib turaman.\n\n"
-        f"💡 **Sinash uchun biror savol yozing:**\n"
-        f"• *Klinika qayerda joylashgan?*\n"
-        f"• *MRT va UZI narxi qancha?*\n"
-        f"• *Yakshanba kuni ishlaysizlarmi?*\n"
-        f"• *Shifokor qabuliga qanday yozilsa bo'ladi?*"
+        f"Men modulli va pluginli arxitekturada ishlovchi **AI Yordamchi Bot**man.\n\n"
+        f"🧩 **Faol pluginlar:**\n{plugins_list}\n\n"
+        f"💡 **Imkoniyatlar:**\n"
+        f"1. Guruhda klinika savollariga avtomatik javob berish\n"
+        f"2. `/excel` buyrug'i orqali klinika hisobotini Gemma 4 modeli orqali tahlil qilish\n"
+        f"3. Ixtiyoriy `.xlsx` fayl yuborib, undan xohlagan statistikani so'rash!"
     )
+    await message.answer(text)
+
+
+@dp.message(Command("plugins"))
+async def cmd_plugins(message: Message):
+    text = "🧩 **O'rnatilgan pluginlar ro'yxati:**\n\n"
+    for i, p in enumerate(plugin_manager.plugins, 1):
+        text += f"{i}. **{p.name}** (Prioritet: {p.priority})\n   Ta'rif: {p.description}\n\n"
     await message.answer(text)
 
 
 @dp.message(Command("help"))
 async def cmd_help(message: Message):
-    """Help komandasi"""
     text = (
-        "ℹ️ **Bot qanday ishlaydi?**\n\n"
-        "1. Botni Telegram guruhga qo'shing.\n"
-        "2. Guruh a'zolari klinika haqida (ish vaqti, narxlar, shifokorlar, manzil va h.k.) savol berganida, "
-        "sun'iy intellekt modeli savolni avtomatik tahlil qilib, mos tayyor javobni yuboradi.\n"
-        "3. Klinikaga aloqador bo'lmagan oddiy gaplarga bot e'tibor bermaydi (spam bo'lmaydi)."
+        "ℹ️ **Qo'llanma va komandalar:**\n\n"
+        "• `/start` — Botni qayta ishga tushirish\n"
+        "• `/plugins` — Faol pluginlar ro'yxati\n"
+        "• `/excel` — Klinika Excel hisoboti demosini ochish va Gemma 4 tahlili\n"
+        "• *Excel fayl yuklash:* `.xlsx` formatidagi faylni shunchaki botga yuboring va savol bering!\n"
+        "• *Klinika savollari:* Guruhda manzil, narx, shifokor va ish vaqtlari bo'yicha savol bering."
     )
     await message.answer(text)
 
 
-@dp.message(Command("model"))
-async def cmd_model(message: Message):
-    """Model holati"""
-    text = (
-        f"🤖 **Model holati:**\n"
-        f"• Model: `{MODEL_NAME}`\n"
-        f"• API: OpenRouter Cloud (Ultra-tez & Arzon)\n"
-        f"• Klinikaga tegishli toifalar soni: {len(classifier.categories)}"
-    )
-    await message.answer(text)
-
-
-@dp.message(F.text)
-async def handle_message(message: Message):
-    """Barcha matnli xabarlarni tahlil qilish"""
-    # Botning o'z xabarlariga javob bermaslik
+@dp.message()
+async def global_message_handler(message: Message):
+    """Barcha kiruvchi xabarlar (guruh va shaxsiy) pluginlar menejeriga yo'naltiriladi"""
     if message.from_user and message.from_user.is_bot:
         return
 
-    text = message.text.strip()
+    text_preview = message.text or message.caption or (message.document.file_name if message.document else "Fayl/Media")
+    logger.info(f"Yangi xabar [{message.chat.type} | ID: {message.chat.id}]: '{text_preview}'")
+
+    context: Dict[str, Any] = {
+        "chat_id": message.chat.id,
+        "chat_type": message.chat.type
+    }
+    await plugin_manager.process_message(message, context)
+
+
+@dp.channel_post()
+async def global_channel_post_handler(message: Message):
+    """Kanalga kelgan yangi post va Excel fayllarni qabul qilish va bazani avto-yangilash"""
     chat_id = message.chat.id
-    is_group = message.chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]
+    title = message.chat.title or "Kanal"
+    text_preview = message.text or message.caption or (message.document.file_name if message.document else "Post")
+    logger.info(f"Kanal posti qabul qilindi [{title} | ID: {chat_id}]: '{text_preview}'")
 
-    # Guruhda tez-tez spam qilmaslik uchun cooldown tekshiruvi
-    now = time.time()
-    if is_group and (now - last_reply_times.get(chat_id, 0)) < COOLDOWN_SECONDS:
-        # Hozirgina javob berilgan bo'lsa, biroz kutish
-        return
+    channel_file = Path("data/channel_id.txt")
+    channel_file.parent.mkdir(parents=True, exist_ok=True)
+    channel_file.write_text(str(chat_id))
 
-    # Model orqali xabarni klassifikatsiya qilish
-    category, response_text = await classifier.classify_message(text)
-
-    if response_text:
-        last_reply_times[chat_id] = now
-        logger.info(f"Chat {chat_id} | Toifa: {category} | Reply yuborildi.")
-        try:
-            await message.reply(response_text)
-        except Exception as e:
-            logger.error(f"Xabar yuborishda xatolik: {e}")
+    if message.document:
+        context: Dict[str, Any] = {
+            "chat_id": chat_id,
+            "chat_type": "channel"
+        }
+        await plugin_manager.process_message(message, context)
     else:
-        # Agar shaxsiy yozishmada (PM) bo'lsa va klinika savoli bo'lmasa, yo'naltirish
-        if not is_group and not text.startswith("/"):
-            await message.answer(
-                "Tushunmadim. Klinikamiz xizmatlari, narxlar, manzil yoki shifokorlar haqida so'rashingiz mumkin."
+        # Kanaldagi har qanday xabarga javoban avtomatik Excel faylni kanalga yuklash
+        billing_excel = Path("data/billing/haftalik_tolovlar.xlsx")
+        if billing_excel.exists():
+            from aiogram.types import FSInputFile
+            doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_oktyabr.xlsx")
+            caption = (
+                "📊 **2026-yil Oktyabr oyi haftalik to'lovlar va qarzdorliklar hisoboti**\n\n"
+                "👥 Jami mijozlar: **10 ta**\n"
+                "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida avtomatik tekshiriladi.\n\n"
+                "#billing #hisobot"
             )
+            await message.answer_document(document=doc, caption=caption)
+            logger.info(f"Excel fayl kanalga ({chat_id}) muvaffaqiyatli joylandi!")
+
+
+@dp.my_chat_member()
+async def on_my_chat_member(event: ChatMemberUpdated):
+    """Bot kanal yoki guruhga qo'shilganda ishlaydi"""
+    chat_id = event.chat.id
+    title = event.chat.title or "Chat"
+    logger.info(f"Bot yangi chatga qo'shildi: chat_id={chat_id}, title='{title}', type={event.chat.type}")
+    
+    if "channel" in str(event.chat.type).lower():
+        channel_file = Path("data/channel_id.txt")
+        channel_file.parent.mkdir(parents=True, exist_ok=True)
+        channel_file.write_text(str(chat_id))
+        
+        billing_excel = Path("data/billing/haftalik_tolovlar.xlsx")
+        if billing_excel.exists():
+            from aiogram.types import FSInputFile
+            try:
+                doc = FSInputFile(billing_excel, filename="haftalik_tolovlar_oktyabr.xlsx")
+                caption = (
+                    "📊 **2026-yil Oktyabr oyi haftalik to'lovlar va qarzdorliklar hisoboti**\n\n"
+                    "👥 Jami mijozlar: **10 ta**\n"
+                    "🔄 Guruhdagi barcha apparatlar statusi ushbu fayl asosida avtomatik tekshiriladi."
+                )
+                await bot.send_document(chat_id=chat_id, document=doc, caption=caption)
+                logger.info(f"Excel fayl kanalga ({chat_id}) yuborildi!")
+            except Exception as e:
+                logger.error(f"Kanalga fayl yuborishda xatolik: {e}")
 
 
 async def main():
-    logger.info("Bot ishga tushmoqda...")
-    logger.info(f"Ishlatilayotgan model: {MODEL_NAME}")
-    
-    # Bot bio va ta'rifini yangilash
-    try:
-        bio = "🏥 «Shifo Nur Med» klinikasi AI yordamchisi. Guruhda manzil, narxlar, shifokorlar va ish vaqtiga avtomatik javob beradi."
-        desc = (
-            "🏥 «Shifo Nur Med» klinikasi rasmiy sun'iy intellekt yordamchisi!\n\n"
-            "Bu bot Telegram guruhda va shaxsiy suhbatda quyidagi mavzularda yordam beradi:\n"
-            "📍 Klinika manzili va lokatsiyasi\n"
-            "⏰ Ish tartibi va qabul vaqtlari\n"
-            "💳 Xizmatlar, tahlillar (UZI, MRT) va narxlar\n"
-            "👨‍⚕️ Shifokorlar ko'rigi va navbatga yozilish\n"
-            "📞 Bog'lanish va Call-markaz kontaktlari\n"
-            "🚨 24/7 Shoshilinch tibbiy yordam\n\n"
-            "Sinash uchun guruhga qo'shing yoki shu yerga savol yozing!"
-        )
-        await bot.set_my_short_description(short_description=bio)
-        await bot.set_my_description(description=desc)
-        logger.info("Bot Bio va Description muvaffaqiyatli yangilandi.")
-    except Exception as e:
-        logger.warning(f"Bio o'rnatishda xatolik: {e}")
+    logger.info("Yadro yuklanmoqda va pluginlar ro'yxatdan o'tkazilmoqda...")
+    plugin_manager.load_plugins()
+    await plugin_manager.startup()
 
-    # Eskirgan update larni o'chirib yuborish
+    # Bio va Description sozlamalari
+    try:
+        bio = "🏥 AI Yordamchi & Ma'lumotlar tahlilchisi. Klinika FAQ va Excel (.xlsx) jadvallarini Gemma 4 da tahlil qiladi."
+        desc = (
+            "🏥 Pluginli arxitekturadagi ko'p funksiyali AI Bot!\n\n"
+            "✨ Imkoniyatlar:\n"
+            "• Klinika bo'yicha FAQ va shevalardagi savollarga avtomatik javoblar\n"
+            "• Excel (.xlsx) jadvallarini yuklab, Gemma 4-26B orqali chuqur tahlil qilish\n"
+            "• Istalgan yangi format va tool'larni plugin sifatida ulash imkoniyati."
+        )
+        await bot.set_my_short_description(short_description=bio[:120])
+        await bot.set_my_description(description=desc)
+    except Exception as e:
+        logger.warning(f"Bio o'rnatishda ogohlantirish: {e}")
+
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
+    logger.info("Bot tayyor! Polling boshlandi...")
+    await dp.start_polling(
+        bot,
+        allowed_updates=["message", "edited_message", "channel_post", "edited_channel_post", "my_chat_member", "chat_member"]
+    )
 
 
 if __name__ == "__main__":

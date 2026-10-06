@@ -6,7 +6,8 @@
       "keywords": [
         "manzil", "qayerda", "lokatsiya", "qaysi joyda", "mo'ljal", "moljal", "orientir", 
         "metro", "qanday boriladi", "qayerdadir", "joylashgan", "qayoqda", "qata", 
-        "qaysi taraf", "qaysi tomonda", "qayerdan topamiz", "yo'lni tushuntir", "qayerdasiz", "qayerda joylashgan"
+        "qaysi taraf", "qaysi tomonda", "qayerdan topamiz", "yo'lni tushuntir", "qayerdasiz", 
+        "avtobus", "marshrut", "qanday boraman", "borish", "geolokatsiya", "karta"
       ],
       "response": "📍 **«Shifo Nur Med» klinikasi manzili:**\n\n🏢 **Manzil:** Toshkent shahar, Chilonzor tumani, Bunyodkor ko'chasi, 45-uy.\n🚇 **Mo'ljal:** «Mirzo Ulug'bek» metro bekati (200 metr).\n🚌 **Avtobuslar:** 33, 56, 84, 98-yo'nalishlar («Bunyodkor stadioni» bekati).\n\n🗺️ **Lokatsiya (geolokatsiya):** https://maps.google.com/?q=41.2825,69.2136"
     },
@@ -15,7 +16,8 @@
       "keywords": [
         "ish vaqti", "ish vaqtlari", "soat nechada", "soat nechigacha", "soat nechagacha", 
         "ochiq", "yopiq", "yakshanba", "shanba", "qachon ishlaydi", "ish kunlari", 
-        "ochumi", "ochiqmi", "yopildimi", "qachon boraylik", "kechqurun", "obet", "kechasi", "ertalab soat"
+        "ochumi", "ochiqmi", "yopildimi", "qachon boraylik", "kechqurun", "obet", 
+        "kechasi", "ertalab soat", "boraylikmi", "borsak bo'ladimi", "borsam bo'ladimi", "ishlayaptimi"
       ],
       "response": "⏰ **«Shifo Nur Med» ish tartibi:**\n\n🗓️ **Dushanba – Shanba:** 08:00 dan 20:00 gacha\n🗓️ **Yakshanba:** 08:30 dan 16:00 gacha (navbatchi shifokorlar va laboratoriya)\n🚨 **Tez tibbiy yordam va qabul bo'limi:** 24/7 (tunu-kun uzluksiz)\n\nLaboratoriya tahlillari har kuni ertalab 08:00 dan boshlab qabul qilinadi."
     },
@@ -25,7 +27,8 @@
         "narx", "narxi", "qancha", "mrt", "uzi", "rentgen", "tahlil", "analiz", "qon", 
         "siydik", "tekshiruv", "ko'rik", "stomatolog", "plomba", "davolash narxi", "puli", 
         "nechpul", "necha pul", "qanchaga tushadi", "baxosi", "bahosi", "qancha to'lanadi", 
-        "necha so'm", "to'lovi", "qanchadan"
+        "necha so'm", "to'lovi", "qanchadan", "qon topshir", "topshirsak", "topshirish", 
+        "xizmat haqi", "qancha ketadi", "olib olay"
       ],
       "response": "💳 **Asosiy xizmatlar va tahlillar narxlari:**\n\n🩺 **Mutaxassis ko'rigi (terapevt, kardiolog, nevropatolog):** 120 000 so'm\n🔬 **Umumiy qon tahlili (UQT):** 45 000 so'm\n🧪 **Biokimyoviy qon tahlili:** 95 000 so'm dan\n🖥️ **UZI (barcha a'zolar kompleks):** 160 000 so'm\n🧲 **MRT tekshiruvi (bitta soha):** 380 000 so'm\n🦷 **Stomatologik ko'rik va konsultatsiya:** Bepul\n\nTo'liq narxlar ro'yxati va chegirmalar haqida ma'lumot olish uchun call-markazimizga murojaat qiling."
     },
@@ -34,7 +37,8 @@
       "keywords": [
         "shifokor", "vrach", "doktor", "do'xtir", "kardiolog", "nevropatolog", "pediatr", 
         "terapevt", "lor", "ginekolog", "stomatolog", "qabul", "navbat", "yozilish", 
-        "konsultatsiya", "ko'rik", "ko'rsatmoqchi", "tekshirtirmoqchi", "do'xtirla", "vrachla"
+        "konsultatsiya", "ko'rsatmoqchi", "tekshirtirmoqchi", "tekshirtirish", "do'xtirla", 
+        "vrachla", "yurak", "jigar", "buyrak", "tish", "davolanish"
       ],
       "response": "👨‍⚕️ **«Shifo Nur Med» shifokorlari va qabulga yozilish:**\n\nKlinikamizda oliy toifali mutaxassislar faoliyat yuritadi:\n• **Kardiolog** — Dr. Karimova N.O.\n• **Nevropatolog** — Dr. Usmonov B.S.\n• **Terapevt/Pediatr** — Dr. Rahimov F.T.\n• **LOR va Oftalmolog** — Dr. Aliyev M.K.\n• **Stomatolog-implantolog** — Dr. Mahmudov D.A.\n\n📝 Shifokor qabuliga oldindan navbat olish uchun:\n📞 **Call-center:** +998 (71) 200-11-22\n📱 **Telegram:** @shifonur_admin"
     },
@@ -42,7 +46,8 @@
       "name": "Aloqa va telefon raqamlar",
       "keywords": [
         "telefon", "nomer", "raqam", "aloqa", "bog'lanish", "administrator", "operator", 
-        "call center", "koll sentr", "kontakt", "admin nomer", "telfon", "tel qilmoqchi", "nomeri"
+        "call center", "koll sentr", "kontakt", "admin nomer", "telfon", "tel qilmoqchi", 
+        "nomeri", "gaplashadigan", "biror odam", "bog'lansak"
       ],
       "response": "📞 **«Shifo Nur Med» bilan bog'lanish:**\n\n☎️ **Yagona Call-markaz:** +998 (71) 200-11-22\n📱 **Mobil / Telegram:** +998 (90) 123-45-67\n✉️ **Telegram admin:** @shifonur_admin\n🌐 **Rasmiy veb-sayt:** www.shifonur-med.uz\n\nSavollaringiz bo'lsa, operatorlarimiz sizga yordam berishdan mamnun!"
     },
